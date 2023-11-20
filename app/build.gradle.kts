@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "edu.uw.ischool.mbacarro.awty"
-        minSdk = 28
+        minSdk = 31
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"

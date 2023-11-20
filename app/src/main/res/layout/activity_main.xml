@@ -34,13 +34,6 @@
         android:inputType="number"
         android:minHeight="48dp" />
 
-    <VideoView
-        android:id="@+id/videoView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/intervalEditText"
-        android:layout_marginTop="16dp"/>
-
     <Button
         android:id="@+id/startStopButton"
         android:layout_width="match_parent"
