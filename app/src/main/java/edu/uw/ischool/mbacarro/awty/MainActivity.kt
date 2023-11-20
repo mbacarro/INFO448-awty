@@ -3,6 +3,8 @@ package edu.uw.ischool.mbacarro.awty
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.telephony.SmsManager
@@ -10,6 +12,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var intervalEditText: EditText
     private lateinit var startStopButton: Button
     private lateinit var smsManager: SmsManager
+    private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var videoView: VideoView
 
     private val TAG = "MainActivity"
     private val SMS_PERMISSION_REQUEST_CODE = 123
@@ -31,6 +36,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         smsManager = SmsManager.getDefault()
+        mediaPlayer = MediaPlayer.create(this, R.raw.samplemp3)
+        videoView = findViewById(R.id.videoView)
+        videoView.setVideoURI(Uri.parse("android.resource://" + packageName + "/" + R.raw.samplemp4))
+        videoView.requestFocus()
 
         messageEditText = findViewById(R.id.messageEditText)
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
@@ -59,6 +68,8 @@ class MainActivity : AppCompatActivity() {
                 val runnable = object : Runnable {
                     override fun run() {
                         sendSMS(phoneNumber, message)
+                        playAudio()
+                        playVideo()
                         showToast("$phoneNumber: $message")
                         handler.postDelayed(this, interval * 60 * 1000)
                     }
@@ -81,6 +92,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopService() {
+        mediaPlayer.stop()
+        videoView.stopPlayback()
         startStopButton.text = "Start"
         isServiceRunning = false
         Log.i(TAG, "stopping service")
@@ -94,6 +107,8 @@ class MainActivity : AppCompatActivity() {
         Thread {
             while (isServiceRunning) {
                 sendSMS(phoneNumber, message)
+                playAudio()
+                playVideo()
                 try {
                     Thread.sleep(interval * 60 * 1000)
                 } catch (e: InterruptedException) {
@@ -127,18 +142,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startService()
-            } else {
-                showToast("SMS permission denied. Cannot send messages.")
-            }
-        }
+    private fun playAudio() {
+        mediaPlayer.start()
+    }
+
+    private fun playVideo() {
+        videoView.start()
     }
 }
